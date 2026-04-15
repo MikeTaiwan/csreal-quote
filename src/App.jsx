@@ -219,7 +219,7 @@ export default function QuoteSystem() {
       padding: 24,
     }}>
       {/* Header */}
-      <div style={{
+      <div className="no-print" style={{
         display: "flex", alignItems: "center", gap: 16, marginBottom: 28,
         borderBottom: `2px solid ${BRAND.blue_deep}`, paddingBottom: 16,
       }}>
@@ -235,7 +235,7 @@ export default function QuoteSystem() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+      <div className="no-print" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
         {/* Left: 客戶資訊 + 品項選擇 */}
         <div>
           {/* 客戶資訊 */}
@@ -463,7 +463,7 @@ export default function QuoteSystem() {
 
       {/* 產生結果 */}
       {generated && (
-        <div style={{
+        <div id="print-area" style={{
           marginTop: 28, background: "#fff", borderRadius: 12, padding: 32, color: "#222",
           border: `3px solid ${BRAND.orange}`,
         }} ref={quoteRef}>
@@ -588,7 +588,7 @@ export default function QuoteSystem() {
             本報價單有效期14天 ‧ CS Real 保留最終解釋權 ‧ 報價單需要本公司蓋章始得生效
           </div>
 
-          <div style={{ marginTop: 16, display: "flex", gap: 10, justifyContent: "flex-end" }}>
+          <div className="no-print" style={{ marginTop: 16, display: "flex", gap: 10, justifyContent: "flex-end" }}>
             <button
               onClick={() => window.print()}
               style={{
@@ -603,9 +603,13 @@ export default function QuoteSystem() {
 
       <style>{`
         @media print {
-          body > * { display: none !important; }
-          body > div > div:last-of-type { display: block !important; }
+          body { background: white !important; }
+          #print-area { display: block !important; }
           button { display: none !important; }
+          .no-print { display: none !important; }
+        }
+        @media screen {
+          #print-area { display: block; }
         }
       `}</style>
     </div>
