@@ -140,8 +140,8 @@ function QuoteRow({ item, onChange, onRemove }) {
 
 
 function CustomItemAdder({ onAdd, inputStyle, BRAND }) {
-  const [name, setName] = React.useState("");
-  const [price, setPrice] = React.useState("");
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
 
   const handleAdd = () => {
     if (!name || !price) return;
