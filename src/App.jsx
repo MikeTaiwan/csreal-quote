@@ -20,14 +20,34 @@ const BRAND = {
 };
 
 
+
+const TERMS = `注意事項
+
+10. 活動日前需在規定的日期內支付訂金，否則視為預約失敗。訂金為活動費用的三成，可匯款或臨櫃繳納，匯款完成後需告知本公司匯款帳戶末五碼，傳送匯款截圖、照片亦可。
+　　匯款資訊：銀行「元大銀行」、戶名「崇昇運動事業股份有限公司」、帳號：20212-0000-85311。
+
+11. 消費者退改政策：
+　　為了保障雙方及其他客人的權益，給付訂金後視為同意以下條款：
+　　(1) 人數少於30人：
+　　　　a. 距離活動日前30天至8天取消，皆可全額退付訂金。
+　　　　b. 距離活動前7～4天內取消，僅退還訂金的50%。
+　　　　c. 若在活動前3天內通知取消，恕不退還訂金。
+　　(2) 人數30人以上：
+　　　　a. 距離活動日前90天至21天取消，皆可全額退付訂金。
+　　　　b. 距離活動前20～14天內取消，僅退還訂金的50%。
+　　　　c. 若在活動前13天內通知取消，恕不退還訂金。
+　　(3) 活動當日非天災、政府公告停止上班，消費者未到或遲到導致無法正常運行，由消費者自行承擔。
+
+以上內容本公司保留最終決定權。`;
+
 const NOTE_TEMPLATES = [
   {
     label: "企業團建",
-    text: "感謝 {客戶} 的詢價！本次報價含場地包場及裝備租借，建議提前7天預約以確保場次。活動當日請準時到場，遲到超過30分鐘視同放棄。如需客製化關卡設計或攝影紀錄服務歡迎告知。報價有效期14天，如有任何問題請來電07-6119160或加LINE洽詢。",
+    text: "感謝 {客戶} 的詢價！本次報價含場地包場及裝備租借，請務必提前至少一個月預約以確保場次。活動當日請準時到場，遲到超過30分鐘視同放棄。如需客製化關卡設計或攝影紀錄服務歡迎告知。報價有效期14天，如有任何問題請來電07-6119160或加LINE洽詢。",
   },
   {
     label: "學生團體",
-    text: "感謝 {客戶} 的詢價！學生團體方案需出示學生證，未成年學員須附家長同意書。建議平日前來，場次彈性較大。本報價有效期14天，歡迎來電或加LINE確認預約細節。",
+    text: "感謝 {客戶} 的詢價！學生團體方案需出示學生證，未成年學員須附家長同意書。建議平日前來，場次彈性較大，請提前至少一個月預約。本報價有效期14天，歡迎來電或加LINE確認預約細節。",
   },
   {
     label: "一般詢價",
@@ -35,7 +55,7 @@ const NOTE_TEMPLATES = [
   },
   {
     label: "獵殺暴龍",
-    text: "感謝您的詢價！獵殺暴龍活動建議人數10人以上，體驗更佳。活動時間約90分鐘，建議穿著輕便運動服裝。報價有效期14天，欲預約請提前來電確認場次。",
+    text: "感謝您的詢價！獵殺暴龍活動建議人數10人以上，體驗更佳。活動時間約90分鐘，建議穿著輕便運動服裝。報價有效期14天，欲預約請提前至少一個月來電確認場次。",
   },
 ];
 
@@ -118,14 +138,55 @@ function QuoteRow({ item, onChange, onRemove }) {
   );
 }
 
+
+function CustomItemAdder({ onAdd, inputStyle, BRAND }) {
+  const [name, setName] = React.useState("");
+  const [price, setPrice] = React.useState("");
+
+  const handleAdd = () => {
+    if (!name || !price) return;
+    onAdd({ name, unit: "式", price: +price, qty: 1 });
+    const again = window.confirm(`已加入「${name}」，是否繼續新增品項？`);
+    if (again) {
+      setName("");
+      setPrice("");
+    } else {
+      setName("");
+      setPrice("");
+    }
+  };
+
+  return (
+    <div style={{ display: "flex", gap: 6, alignItems: "flex-end" }}>
+      <div style={{ flex: 2 }}>
+        <div style={{ color: "#a8c4d8", fontSize: 11, marginBottom: 3 }}>品項名稱</div>
+        <input style={inputStyle} value={name}
+          onChange={e => setName(e.target.value)}
+          placeholder="自訂品項名稱" />
+      </div>
+      <div style={{ flex: 1 }}>
+        <div style={{ color: "#a8c4d8", fontSize: 11, marginBottom: 3 }}>金額</div>
+        <input type="number" style={inputStyle} value={price}
+          onChange={e => setPrice(e.target.value)}
+          placeholder="0" />
+      </div>
+      <button onClick={handleAdd} style={{
+        background: BRAND.blue_deep, border: "none", borderRadius: 5,
+        color: "#fff", padding: "7px 12px", cursor: "pointer", fontSize: 13,
+        whiteSpace: "nowrap",
+      }}>＋ 加入</button>
+    </div>
+  );
+}
+
 export default function QuoteSystem() {
   const [client, setClient] = useState({ name: "", contact: "", phone: "", email: "", actDate: "", actTime: "", actPeople: "", date: new Date().toISOString().slice(0, 10) });
   const [rows, setRows] = useState([]);
   const [specialPrice, setSpecialPrice] = useState("");
   const [note, setNote] = useState("");
+  const [selectedNotes, setSelectedNotes] = useState([]);
   const [generated, setGenerated] = useState(false);
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiNote, setAiNote] = useState("");
+
   const quoteRef = useRef(null);
 
   const addItem = (preset) => {
@@ -135,36 +196,7 @@ export default function QuoteSystem() {
   const total = rows.reduce((s, r) => s + r.qty * r.price, 0);
   const finalTotal = specialPrice !== "" && +specialPrice > 0 ? +specialPrice : total;
 
-  const handleAiNote = async () => {
-    if (!client.name || rows.length === 0) {
-      alert("請先填寫客戶名稱並加入項目");
-      return;
-    }
-    setAiLoading(true);
-    setAiNote("");
-    try {
-      const itemSummary = rows.map(r => `${r.name} x${r.qty}`).join("、");
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 300,
-          messages: [{
-            role: "user",
-            content: `你是CS Real室內生存遊戲場的業務。請幫我為「${client.name}」寫一段報價單備注，
-內容包含：感謝對方詢價、說明已含品項：${itemSummary}、總金額NT$${finalTotal.toLocaleString()}，
-提醒對方有效期14天、如有疑問可聯絡我們。語氣專業親切，繁體中文，100字以內。`
-          }]
-        })
-      });
-      const data = await res.json();
-      setAiNote(data.content?.[0]?.text || "");
-    } catch {
-      setAiNote("（AI備注產生失敗，請手動填寫）");
-    }
-    setAiLoading(false);
-  };
+
 
   const inputStyle = {
     background: "rgba(168,196,216,0.1)",
@@ -291,6 +323,13 @@ export default function QuoteSystem() {
                 }}>+ 加入</button>
               </div>
             ))}
+            <div style={{
+              marginTop: 10, paddingTop: 10,
+              borderTop: `1px solid ${BRAND.blue_deep}`,
+            }}>
+              <div style={{ color: "#e8f0f5", fontWeight: 700, marginBottom: 8, fontSize: 13 }}>＋ 自訂品項</div>
+              <CustomItemAdder onAdd={(item) => setRows(r => [...r, { ...item, rowId: Date.now() }])} inputStyle={inputStyle} BRAND={BRAND} />
+            </div>
           </div>
         </div>
 
@@ -367,20 +406,31 @@ export default function QuoteSystem() {
           }}>
             <div style={{ color: "#e8f0f5", fontWeight: 700, fontSize: 15, marginBottom: 10 }}>✍️ 備注說明</div>
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
-              {NOTE_TEMPLATES.map((t, i) => (
-                <button key={i} onClick={() => {
-                  const text = t.text.replace("{客戶}", client.name || "貴公司");
-                  setNote(text);
-                }} style={{
-                  background: "rgba(61,96,128,0.4)",
-                  border: `1px solid ${BRAND.blue_mid}`,
-                  borderRadius: 5, color: BRAND.blue_light,
-                  padding: "4px 10px", cursor: "pointer", fontSize: 12,
-                }}>
-                  {t.label}
-                </button>
-              ))}
-              <button onClick={() => setNote("")} style={{
+              {NOTE_TEMPLATES.map((t, i) => {
+                const isSelected = selectedNotes.includes(i);
+                return (
+                  <button key={i} onClick={() => {
+                    const text = t.text.replace("{客戶}", client.name || "貴公司");
+                    if (isSelected) {
+                      setSelectedNotes(selectedNotes.filter(n => n !== i));
+                      setNote(prev => prev.split(text).join("").replace(/  +/g, " ").trim());
+                    } else {
+                      setSelectedNotes([...selectedNotes, i]);
+                      setNote(prev => prev ? prev + "\n\n" + text : text);
+                    }
+                  }} style={{
+                    background: isSelected ? BRAND.orange : "rgba(61,96,128,0.4)",
+                    border: `1px solid ${isSelected ? BRAND.orange : BRAND.blue_mid}`,
+                    borderRadius: 5,
+                    color: isSelected ? "#fff" : BRAND.blue_light,
+                    padding: "4px 10px", cursor: "pointer", fontSize: 12,
+                    fontWeight: isSelected ? 700 : 400,
+                  }}>
+                    {isSelected ? "✓ " : ""}{t.label}
+                  </button>
+                );
+              })}
+              <button onClick={() => { setNote(""); setSelectedNotes([]); }} style={{
                 background: "transparent",
                 border: `1px solid rgba(212,96,26,0.4)`,
                 borderRadius: 5, color: BRAND.orange,
@@ -391,7 +441,7 @@ export default function QuoteSystem() {
               style={{ ...inputStyle, minHeight: 90, resize: "vertical", lineHeight: 1.6 }}
               value={note}
               onChange={e => setNote(e.target.value)}
-              placeholder="點選上方範本快速帶入，或直接手動輸入..."
+              placeholder="可複選上方範本疊加，或直接手動輸入..."
             />
           </div>
 
@@ -516,15 +566,23 @@ export default function QuoteSystem() {
             </div>
           </div>
 
-          {(aiNote || note) && (
+          {note && (
             <div style={{
               background: "#fffbf5", border: `1px solid #f0d5b0`, borderRadius: 6,
               padding: "10px 14px", fontSize: 13, color: "#444", lineHeight: 1.7,
+              marginBottom: 12,
             }}>
               <div style={{ fontWeight: 700, marginBottom: 4, color: BRAND.orange }}>備注</div>
-              {aiNote || note}
+              <div style={{ whiteSpace: "pre-wrap" }}>{note}</div>
             </div>
           )}
+          <div style={{
+            background: "#f8f8f8", border: `1px solid #ddd`, borderRadius: 6,
+            padding: "12px 14px", fontSize: 11, color: "#555", lineHeight: 1.9,
+            whiteSpace: "pre-wrap",
+          }}>
+            {TERMS}
+          </div>
 
           <div style={{ marginTop: 20, fontSize: 11, color: "#999", textAlign: "center" }}>
             本報價單有效期14天 ‧ CS Real 保留最終解釋權 ‧ 報價單需要本公司蓋章始得生效
