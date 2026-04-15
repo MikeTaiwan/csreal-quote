@@ -8,6 +8,7 @@ const COMPANY = {
   brand: "CS Real 城市戰場",
   address: "高雄市苓雅區三多四路63巷2弄14號",
   tel: "07-6119160",
+  email: "cs.kaohsiung.service@gmail.com",
   taxId: "42998483",
 };
 
@@ -118,7 +119,7 @@ function QuoteRow({ item, onChange, onRemove }) {
 }
 
 export default function QuoteSystem() {
-  const [client, setClient] = useState({ name: "", contact: "", phone: "", date: new Date().toISOString().slice(0, 10) });
+  const [client, setClient] = useState({ name: "", contact: "", phone: "", email: "", actDate: "", actTime: "", actPeople: "", date: new Date().toISOString().slice(0, 10) });
   const [rows, setRows] = useState([]);
   const [specialPrice, setSpecialPrice] = useState("");
   const [note, setNote] = useState("");
@@ -217,7 +218,7 @@ export default function QuoteSystem() {
                 onChange={e => setClient({ ...client, name: e.target.value })}
                 placeholder="例：台鋼獵鷹企業團隊" />
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
               <div>
                 <label style={labelStyle}>聯絡人</label>
                 <input style={inputStyle} value={client.contact}
@@ -230,10 +231,38 @@ export default function QuoteSystem() {
                   onChange={e => setClient({ ...client, phone: e.target.value })}
                   placeholder="0912-345-678" />
               </div>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
+              <div>
+                <label style={labelStyle}>客戶 Email</label>
+                <input style={inputStyle} value={client.email}
+                  onChange={e => setClient({ ...client, email: e.target.value })}
+                  placeholder="example@company.com" />
+              </div>
               <div>
                 <label style={labelStyle}>報價日期</label>
                 <input type="date" style={inputStyle} value={client.date}
                   onChange={e => setClient({ ...client, date: e.target.value })} />
+              </div>
+            </div>
+            <div style={{ color: "#e8f0f5", fontWeight: 700, margin: "10px 0 8px", fontSize: 13 }}>📅 活動資訊</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+              <div>
+                <label style={labelStyle}>活動日期</label>
+                <input type="date" style={inputStyle} value={client.actDate}
+                  onChange={e => setClient({ ...client, actDate: e.target.value })} />
+              </div>
+              <div>
+                <label style={labelStyle}>活動時間</label>
+                <input style={inputStyle} value={client.actTime}
+                  onChange={e => setClient({ ...client, actTime: e.target.value })}
+                  placeholder="10:30 ~ 13:30" />
+              </div>
+              <div>
+                <label style={labelStyle}>人數</label>
+                <input type="number" style={inputStyle} value={client.actPeople}
+                  onChange={e => setClient({ ...client, actPeople: e.target.value })}
+                  placeholder="50" />
               </div>
             </div>
           </div>
@@ -394,6 +423,7 @@ export default function QuoteSystem() {
               <div style={{ fontSize: 12, color: "#666" }}>城市戰場室內生存遊戲場</div>
               <div style={{ fontSize: 12, color: "#555" }}>{COMPANY.address}</div>
               <div style={{ fontSize: 12, color: "#555" }}>電話：{COMPANY.tel}　統編：{COMPANY.taxId}</div>
+              <div style={{ fontSize: 12, color: "#555" }}>{COMPANY.email}</div>
             </div>
             <div style={{ textAlign: "right" }}>
               <div style={{ fontSize: 22, fontWeight: 900, color: BRAND.blue_deep }}>報 價 單</div>
@@ -403,14 +433,47 @@ export default function QuoteSystem() {
           </div>
 
           <div style={{
-            background: "#f5f8fa", borderRadius: 6, padding: "10px 14px", marginBottom: 16,
+            background: "#f5f8fa", borderRadius: 6, padding: "12px 14px", marginBottom: 16,
             border: `1px solid ${BRAND.blue_light}`,
+            display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8,
           }}>
-            <span style={{ fontSize: 13, color: "#555" }}>客戶：</span>
-            <span style={{ fontWeight: 700 }}>{client.name || "（未填）"}</span>
-            {client.contact && <span style={{ fontSize: 13, color: "#666", marginLeft: 16 }}>聯絡人：{client.contact}</span>}
-            {client.phone && <span style={{ fontSize: 13, color: "#666", marginLeft: 12 }}>電話：{client.phone}</span>}
+            <div>
+              <div style={{ fontSize: 11, color: "#888", marginBottom: 2 }}>客戶</div>
+              <div style={{ fontWeight: 700, fontSize: 14 }}>{client.name || "（未填）"}</div>
+            </div>
+            {client.contact && <div>
+              <div style={{ fontSize: 11, color: "#888", marginBottom: 2 }}>聯絡人</div>
+              <div style={{ fontSize: 14 }}>{client.contact}</div>
+            </div>}
+            {client.phone && <div>
+              <div style={{ fontSize: 11, color: "#888", marginBottom: 2 }}>電話</div>
+              <div style={{ fontSize: 14 }}>{client.phone}</div>
+            </div>}
+            {client.email && <div>
+              <div style={{ fontSize: 11, color: "#888", marginBottom: 2 }}>Email</div>
+              <div style={{ fontSize: 14 }}>{client.email}</div>
+            </div>}
           </div>
+          {(client.actDate || client.actTime || client.actPeople) && (
+            <div style={{
+              background: "#f0f5f0", borderRadius: 6, padding: "10px 14px", marginBottom: 16,
+              border: `1px solid #c8ddc8`,
+              display: "flex", gap: 24, flexWrap: "wrap",
+            }}>
+              {client.actDate && <div>
+                <span style={{ fontSize: 11, color: "#888" }}>活動日期　</span>
+                <span style={{ fontSize: 13, fontWeight: 600 }}>{client.actDate}</span>
+              </div>}
+              {client.actTime && <div>
+                <span style={{ fontSize: 11, color: "#888" }}>時間　</span>
+                <span style={{ fontSize: 13, fontWeight: 600 }}>{client.actTime}</span>
+              </div>}
+              {client.actPeople && <div>
+                <span style={{ fontSize: 11, color: "#888" }}>人數　</span>
+                <span style={{ fontSize: 13, fontWeight: 600 }}>{client.actPeople} 人</span>
+              </div>}
+            </div>
+          )}
 
           <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 16, fontSize: 13 }}>
             <thead>
@@ -464,7 +527,7 @@ export default function QuoteSystem() {
           )}
 
           <div style={{ marginTop: 20, fontSize: 11, color: "#999", textAlign: "center" }}>
-            本報價單有效期14天 ‧ CS Real 保留最終解釋權
+            本報價單有效期14天 ‧ CS Real 保留最終解釋權 ‧ 報價單需要本公司蓋章始得生效
           </div>
 
           <div style={{ marginTop: 16, display: "flex", gap: 10, justifyContent: "flex-end" }}>
